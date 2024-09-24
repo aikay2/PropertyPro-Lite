@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'djoser',
     'corsheaders',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -223,4 +224,12 @@ LOGGING = {
     },
 }
 
-
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   },
+}

@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -24,6 +25,7 @@ class PropertyAPIView(generics.GenericAPIView):
         
         return queryset
     
+    @swagger_auto_schema(operation_description="Get a list of property adverts")
     def get(self, request):
         properties = self.get_queryset()
         serializer = self.serializer_class(instance=properties, many=True)
@@ -34,6 +36,7 @@ class PropertyAPIView(generics.GenericAPIView):
         }
         return Response(message, status=status.HTTP_200_OK)
     
+    @swagger_auto_schema(operation_description="Create a property advert")
     def post(self, request):
         data = request.data
         serializer = self.serializer_class(data=data)
@@ -58,6 +61,7 @@ class SinglePropertyAPIView(generics.GenericAPIView):
     serializer_class = PropertySerializer
     permission_classes = [IsAgentOrReadOnly]
     
+    @swagger_auto_schema(operation_description="Retrieve a single property advert by id")
     def get(self, request, pk):
         property = get_object_or_404(Property, pk=pk)
         serializer = self.serializer_class(instance=property)
@@ -67,6 +71,7 @@ class SinglePropertyAPIView(generics.GenericAPIView):
         }
         return Response(message, status=status.HTTP_200_OK)
     
+    @swagger_auto_schema(operation_description="Update a single property advert by id")
     def put(self, request, pk):
         property = get_object_or_404(Property, pk=pk)
         data = request.data
@@ -85,7 +90,8 @@ class SinglePropertyAPIView(generics.GenericAPIView):
         }
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, requesr, pk):
+    @swagger_auto_schema(operation_description="Delete a property advert by id")
+    def delete(self, request, pk):
         property = get_object_or_404(Property, pk=pk)
         property.delete()
         message = {
@@ -100,6 +106,7 @@ class PropertyStatusAPIView(generics.UpdateAPIView):
     permission_classes = [IsAgent]
     queryset = Property.objects.all()
     
+    @swagger_auto_schema(operation_description="Update the status of a property by id") 
     def patch(self, request, pk):
         property = self.get_object()
         data = request.data
@@ -124,6 +131,7 @@ class FlagCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticatedAndOwner]
     serializer_class = FlagSerializer
 
+    @swagger_auto_schema(operation_description="Flag a property advert")
     def post(self, request, *args, **kwargs):
         property_id = self.kwargs['pk']
         property_instance = Property.objects.get(pk=property_id)  # Fetch the property instance
@@ -156,7 +164,6 @@ class FlagDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FlagSerializer
     
     def get_object(self):
-        # Get the flag object based on the provided flag ID (pk) in the URL
         flag = super().get_object()
         
         # Ensure that the flag belongs to the user making the request
@@ -164,10 +171,10 @@ class FlagDetailView(generics.RetrieveUpdateDestroyAPIView):
             raise PermissionDenied("You do not have permission to modify this flag.")
         return flag
 
+    @swagger_auto_schema(operation_description="Update a flag by id")
     def put(self, request, *args, **kwargs):
-        # Use the standard update process, but ensure that the flag belongs to the user
         return super().update(request, *args, **kwargs)
 
+    @swagger_auto_schema(operation_description="Delete a flag by id")
     def delete(self, request, *args, **kwargs):
-        # Use the standard delete process, but ensure that the flag belongs to the user
         return super().destroy(request, *args, **kwargs)

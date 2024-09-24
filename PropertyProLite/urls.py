@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,8 +27,10 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')), 
     path('auth/jwt/create/', TokenObtainPairView.as_view(), name='jwt-create'), 
     path('auth/jwt/refresh/', TokenRefreshView.as_view(), name='jwt-refresh'),
+    path('auth/jwt/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
     
-    # path('api/', include('marketplace.urls')),
+    path('api/', include('marketplace.urls')),
 ]
 
 if settings.DEBUG:

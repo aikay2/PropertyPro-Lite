@@ -14,7 +14,7 @@ class CustomUserCreationForm(forms.ModelForm):
     
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'address', 'phoneNumber', 'user_type')
+        fields = ('username', 'first_name', 'last_name', 'email', 'address', 'phoneNumber', 'user_type')
 
     def clean_password2(self):
         password1 = self.cleaned_data["password1"]
@@ -42,18 +42,20 @@ class CustomUserCreationForm(forms.ModelForm):
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     model = CustomUser
-    list_display = ('username', 'first_name', 'last_name', 'is_staff')
+    list_display = ('username', 'first_name', 'last_name', 'user_type')
 
     # Specify fields for the admin
     fieldsets = (
-        (None, {'fields': ('username', 'first_name', 'last_name', 'address', 'phoneNumber', 'is_active', 'is_staff')}),
+        (None, {'fields': ('username', 'first_name', 'last_name', 'email', 'address', 'phoneNumber', 'user_type', 'is_active', 'is_staff')}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'first_name', 'last_name', 'address', 'phoneNumber', 'password1', 'password2', 'user_type'),
+            'fields': ('username', 'first_name', 'last_name', 'email', 'address', 'phoneNumber', 'password1', 'password2', 'user_type'),
         }),
     )
     
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Agent)
+admin.site.register(Customer)

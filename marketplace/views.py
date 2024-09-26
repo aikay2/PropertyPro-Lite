@@ -4,6 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAgentOrReadOnly, IsAgent, IsAuthenticatedAndOwner
 from .models import Property, PropertyImage, Flags
 from .serializers import PropertySerializer, PropertyStatusSerializer, FlagSerializer
@@ -153,11 +154,27 @@ class FlagCreateView(generics.CreateAPIView):
         
         
 class FlagListView(generics.ListAPIView):
+    # List of all flags
     queryset = Flags.objects.all()
-    permission_classes = [IsAuthenticatedAndOwner]
+    permission_classes = [IsAuthenticated]
     serializer_class = FlagSerializer
     
 
+class FlagPropertyList(generics.ListAPIView):
+    # List of all flags made on a particular property
+    serializer_class = FlagSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        flags = Flags.objects.all().filter(property_id=pk)
+        serializer = self.serializer_class(instance=flags, many=True)
+        message = {
+            "status": "success",
+            "data": serializer.data,
+        }
+        return Response(message, status=status.HTTP_200_OK)
+        
+    
 class FlagDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Flags.objects.all()
     permission_classes = [IsAuthenticatedAndOwner]

@@ -165,6 +165,7 @@ class FlagPropertyList(generics.ListAPIView):
     serializer_class = FlagSerializer
     permission_classes = [IsAuthenticated]
     
+    @swagger_auto_schema(operation_description="List all flags made on a particular property")
     def get(self, request, pk):
         flags = Flags.objects.all().filter(property_id=pk)
         serializer = self.serializer_class(instance=flags, many=True)
